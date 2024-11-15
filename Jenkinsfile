@@ -20,6 +20,7 @@ pipeline {
       NEXUSPORT ='8081'
       sonar_scanner = 'sonar4.7'
       sonar_server = 'sonar'
+      NEXUS_LOGIN = 'nexus_login'
     }
     stages {
         stage("Test") {
@@ -56,6 +57,26 @@ pipeline {
         stage('build artifact') {
           steps {
             sh 'mvn -s settings.xml -DskipTests install'
+          }
+        }
+
+        stage("upload to nexus") {
+          steps {
+                nexusArtifactUploader(
+                nexusVersion: 'nexus3',
+                protocol: 'http',
+                nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
+                groupId: 'QA',
+                version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                repository: "${RELEASE_REPO}" , 
+                credentialsId: "${NEXUS_LOGIN}",
+                artifacts: [
+                    [artifactId: vproapp,
+                    classifier: '',
+                    file: 'target/vprofile-v2.war',
+                    type: 'war']
+                ]
+                )
           }
         }
     }
