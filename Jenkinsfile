@@ -16,7 +16,7 @@ pipeline {
       RELEASE_REPO = 'vprofile-release'
       CENTRAL_REPO = 'vprofile-mvn-central'
       NEXUS_GRP_REPO = 'vprofile-group'
-      NEXUSIP = '52.73.146.126'
+      NEXUSIP = '54.208.195.113'
       NEXUSPORT ='8081'
       sonar_scanner = 'sonar4.7'
       sonar_server = 'sonar'
@@ -53,7 +53,6 @@ pipeline {
             }
           }
         }
-
         stage('build artifact') {
           steps {
             sh 'mvn -s settings.xml -DskipTests install'
@@ -77,6 +76,29 @@ pipeline {
                     type: 'war']
                 ]
                 )
+          }
+        }
+
+        stage("deploy using ansible") {
+          steps {
+            ansiblePlaybook([
+              playbook: 'ansible/sites.yml',
+              inventory: 'ansible/satge-inventory',
+              credentialsId: 'app_login',
+              colorized: true,
+              installation: 'ansible',
+              disableHostKeyChecking: true,
+              extraVars: [
+                NEXUS_USER = 'admin',
+                NEXUX_PASS = "admin",
+                NEXUX_IP = '54.208.195.113',
+                NEXUS_PORT = '8081',
+                RELEASE_REPO = 'vprofile-release',
+                groupId = 'QA',
+                artifactId = 'vproapp',
+                version = "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}"
+              ]
+            ])
           }
         }
     }
