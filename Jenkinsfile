@@ -47,7 +47,7 @@ pipeline {
             -Dsonar.java.binaries=target/classes/com/visualpathit/account/controller \
             -Dsonar.junit.reportsPath=target/surefire-reports \
             -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-            -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml \ '''
+            -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml '''
           }
         }
 
