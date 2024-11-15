@@ -61,7 +61,7 @@ pipeline {
     post {
       always {
         slackSend channel: '#jenkins-ansible',
-        color: color_map[currentBuild.currentResult]
+        color: color_map[currentBuild.currentResult],
         message: "Find Status of Pipeline:- ${currentBuild.currentResult}: ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n more info at ${BUILD_URL}"
       }
     }
