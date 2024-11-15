@@ -6,8 +6,8 @@ def color_map = [
 pipeline {
     agent any 
     tools {
-      JDK 'OracleJDK11'
-      MAVEN 'MAVEN3'
+      jdk 'OracleJDK11'
+      maven 'MAVEN3'
     }
     environment {
       NEXUS_USER = 'admin'
