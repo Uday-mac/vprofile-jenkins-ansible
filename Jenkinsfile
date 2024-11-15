@@ -49,6 +49,7 @@ pipeline {
             -Dsonar.jacoco.reportPaths=target/jacoco.exec \
             -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml '''
           }
+          }
         }
 
         stage('build artifact') {
