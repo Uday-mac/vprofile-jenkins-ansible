@@ -96,7 +96,7 @@ pipeline {
                 RELEASE_REPO = 'vprofile-release',
                 groupId = 'QA',
                 artifactId = 'vproapp',
-                version = "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}"
+                version = "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
               ]
             )
           }
