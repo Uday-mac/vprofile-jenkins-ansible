@@ -1,75 +1,75 @@
 ---
-name: Tomcat setup
-host: appsvrgrp
-become: yes
-vasr:
-  tomcat_url: https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.83/bin/apache-tomcat-8.5.83.tar.gz
-tasks: 
-  - name: installing java
-    apt:
-      name: openjdk-8-jdk
-      state: present
-      update_cache: yes
+- name: Tomcat setup
+  hosts: app
+  become: yes
+  vars:
+    tomcat_url: https://apache.root.lu/tomcat/tomcat-8/v8.5.93/bin/apache-tomcat-8.5.93.tar.gz
+  tasks: 
+    - name: installing java
+      apt:
+        name: openjdk-8-jdk
+        state: present
+        update_cache: yes
 
-  - name: download tomcat
-    get_urL:
-      url: "{{ tomcat_url }}"
-      dest: /tmp/tomcat-8.tar.gz
+    - name: download tomcat
+      get_url:
+        url: "{{ tomcat_url }}"
+        dest: /tmp/tomcat-8.tar.gz
 
-  - name: Add tomcat group
-    group:
-      name: tomcat 
-      state: present 
+    - name: Add tomcat group
+      group:
+        name: tomcat 
+        state: present 
 
-  - name: create user tomcat 
-    user: 
-      name: tomcat
-      shell: /bin/nologin
-      home: /usr/local/tomcat8
-      group: tomcat 
+    - name: create user tomcat 
+      user: 
+        name: tomcat
+        shell: /bin/nologin
+        home: /usr/local/tomcat8
+        group: tomcat 
 
-  - name: tomcat directory
-    file: 
-      path: /tmp/tomcat8 
-      state: directory 
+    - name: tomcat directory
+      file: 
+        path: /tmp/tomcat8 
+        state: directory 
 
-  - name: unarchive Tomcat
-    unarchive:
-      src: /tmp/tomcat-8.tar.gz
-      dest: /tmp/tomcat8
-      remote_src: yes
-      list_files: yes
-    register: unarchive_info
+    - name: unarchive Tomcat
+      unarchive:
+        src: /tmp/tomcat-8.tar.gz
+        dest: /tmp/tomcat8
+        remote_src: yes
+        list_files: yes
+      register: unarchive_info
 
-  - debug:
-    msg: "{{ unarchive_info.files[0].split('/')[0] }}"
+    - debug:
+        msg: "{{ unarchive_info.files[0].split('/')[0] }}"
 
-  - name: Synchronize /tmp/tomcat8 with /usr/local/tomcat8
-    synchronize: 
-      src:  "/tmp/tomcat8/{{ unarchive_info.files[0].split('/')[0] }}/"
-      dest: /usr/local/tomcat8/
-    delegate_to: "{{ inventory_hostname }}"
-  
-  - name: change ownership of /usr/local/tomcat8 
-    file:
-      path: usr/local/tomcat8/
-      owner: tomcat
-      group: tomcat
-      recurse: yes
+    - name: Synchronize /tmp/tomcat8 with /usr/local/tomcat8
+      synchronize: 
+        src:  "/tmp/tomcat8/{{ unarchive_info.files[0].split('/')[0] }}/"
+        dest: /usr/local/tomcat8/
+      delegate_to: "{{ inventory_hostname }}"
+    
+    - name: change ownership of /usr/local/tomcat8 
+      file:
+        path: /usr/local/tomcat8/
+        owner: tomcat
+        group: tomcat
+        recurse: yes
 
-  - name: Creating systemd file for tomcat
-    template:
-      src: templates/tomcat-svc.j2 
-      dest: /etc/systemd/system/tomcat.service 
-      mode: "a+x"
+    - name: Creating systemd file for tomcat
+      template:
+        src: templates/tomcat-svc.j2 
+        dest: /etc/systemd/system/tomcat.service 
+        mode: "a+x"
 
-  - name: restart systemd
-    systemd:
-      daemon-reload: yes
+    - name: restart systemd
+      systemd:
+        daemon-reload: yes
 
-  - name: start and enabled the tomcat service 
-    service:
-      name: tomcat
-      state: started 
-      enabled: yes 
+    - name: start and enabled the tomcat service 
+      service:
+        name: tomcat
+        state: started 
+        enabled: yes 
   

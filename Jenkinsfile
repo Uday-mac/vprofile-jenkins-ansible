@@ -16,7 +16,7 @@ pipeline {
       RELEASE_REPO = 'vprofile-release'
       CENTRAL_REPO = 'vprofile-mvn-central'
       NEXUS_GRP_REPO = 'vprofile-group'
-      NEXUSIP = '54.208.195.113'
+      NEXUSIP = '44.220.143.177'
       NEXUSPORT ='8081'
       sonar_scanner = 'sonar4.7'
       sonar_server = 'sonar'
@@ -90,8 +90,8 @@ pipeline {
               disableHostKeyChecking: true,
               extraVars: [
                 NEXUS_USER = 'admin',
-                NEXUX_PASS = "admin",
-                NEXUX_IP = '54.208.195.113',
+                NEXUX_PASS = 'admin',
+                NEXUX_IP = '44.220.143.177',
                 NEXUS_PORT = '8081',
                 RELEASE_REPO = 'vprofile-release',
                 groupId = 'QA',

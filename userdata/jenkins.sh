@@ -15,3 +15,11 @@ echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
 sudo apt-get update
 
 sudo apt-get install jenkins -y
+
+#installing ansible 
+
+sudo apt install software-properties-common
+
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+
+sudo apt install ansible -y
