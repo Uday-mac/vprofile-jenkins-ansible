@@ -81,7 +81,7 @@ pipeline {
 
         stage("deploy using ansible") {
           steps {
-            ansiblePlaybook([
+            ansiblePlaybook(
               playbook: 'ansible/sites.yml',
               inventory: 'ansible/satge-inventory',
               credentialsId: 'app_login',
@@ -98,7 +98,7 @@ pipeline {
                 artifactId = 'vproapp',
                 version = "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}"
               ]
-            ])
+            )
           }
         }
     }
