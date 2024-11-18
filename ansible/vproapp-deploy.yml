@@ -6,7 +6,7 @@
     timestamp: "{{ansible_date_time.date}}_{{ansible_date_time.houe}}_{{ansible_date_time.minute}}"
   tasks:
     - name: Download artifact
-      get_urL:
+      get_url:
         url: "http://{{USER}}:{{PASS}}@{{IP}}:{{PORT}}/repository/{{REPO}}/{{groupId}}/{{artifactId}}/{{version}}/{{artifactId}}-{{version}}.war"
         dest: "/tmp/vpropp-{{version}}"
       register: war_deploy
