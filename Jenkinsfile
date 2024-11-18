@@ -78,12 +78,11 @@ pipeline {
                 )
           }
         }
-
         stage("deploy using ansible") {
           steps {
             ansiblePlaybook(
               playbook: 'ansible/sites.yml',
-              inventory: 'ansible/satge-inventory',
+              inventory: 'ansible/stage-inventory',
               credentialsId: 'app_login',
               colorized: true,
               installation: 'ansible',
