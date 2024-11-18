@@ -7,7 +7,7 @@
   tasks:
     - name: Download artifact
       get_urL:
-        url: "http://{{NEXUS_USER}}:{{NEXUX_PASS}}@{{NEXUX_IP}}:{{NEXUS_PORT}}/repository/{{RELEASE_REPO}}/{{groupId}}/{{artifactId}}/{{version}}/{{artifactId}}-{{version}}.war"
+        url: "http://{{USER}}:{{PASS}}@{{IP}}:{{PORT}}/repository/{{REPO}}/{{groupId}}/{{artifactId}}/{{version}}/{{artifactId}}-{{version}}.war"
         dest: "/tmp/vpropp-{{version}}"
       register: war_deploy
 

@@ -86,7 +86,18 @@ pipeline {
               credentialsId: 'app_login',
               colorized: true,
               installation: 'ansible',
-              disableHostKeyChecking: true
+              disableHostKeyChecking: true,
+              extraVars: [
+                USER: 'admin',
+                PASS: 'admin',
+                IP: '3.87.77.101',
+                PORT: '8081',
+                REPO: 'vprofile-release',
+                groupId: 'QA',
+                artifactId: 'vproapp',
+                version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}"
+              ]
+
             )
           }
         }
