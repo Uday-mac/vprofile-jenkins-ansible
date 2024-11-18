@@ -86,17 +86,7 @@ pipeline {
               credentialsId: 'app_login',
               colorized: true,
               installation: 'ansible',
-              disableHostKeyChecking: true,
-              extraVars: [
-                NEXUS_USER = 'admin',
-                NEXUX_PASS = 'admin',
-                NEXUX_IP = '3.87.77.101',
-                NEXUS_PORT = '8081',
-                RELEASE_REPO = 'vprofile-release',
-                groupId = 'QA',
-                artifactId = 'vproapp',
-                version = "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-              ]
+              disableHostKeyChecking: true
             )
           }
         }
