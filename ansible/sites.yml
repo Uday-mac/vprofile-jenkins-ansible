@@ -1,0 +1,2 @@
+---
+- import_playbook: vproapp-deploy.yml

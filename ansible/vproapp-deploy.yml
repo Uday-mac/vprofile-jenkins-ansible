@@ -1,0 +1,76 @@
+---
+- name: Download and deploy 
+  hosts: app
+  become: yes
+  vars: 
+    timestamp: "{{ansible_date_time.date}}_{{ansible_date_time.hour}}_{{ansible_date_time.minute}}"
+  tasks:
+    - name: Download artifact
+      get_url:
+        url: "http://{{USER}}:{{PASS}}@{{IP}}:{{PORT}}/repository/{{REPO}}/{{groupId}}/{{artifactId}}/{{version}}/{{artifactId}}-{{version}}.war"
+        dest: "/tmp/vpropp-{{version}}"
+      register: war_deploy
+
+    - stat:
+        path: /usr/local/tomcat8/webapps/ROOT
+      register: artifact_stat
+
+    - name: stopping the tomcat service 
+      service:
+        name: tomcat 
+        state: stopped
+
+    - name: Try back up and deploy 
+      block:
+        - name: backup the old artifact
+          archive:
+            path: /usr/local/tomcat8/webapps/ROOT 
+            dest: "/opt/ROOT_{{timestamp}}.tgz"
+          when: artifact_stat.stat.exists
+          register: archive_info
+
+        - name: Copy root to old_root
+          shell: cp -r ROOT old_ROOT 
+          args: 
+            chdir: /usr/local/tomcat8/webapps/
+
+        - name: deleting current artifact 
+          file: 
+            path: "{{item}}"
+            state: absent 
+          when: archive_info.changed
+          loop:
+            - /usr/local/tomcat8/webapps/ROOT
+            - /usr/local/tomcat8/webapps/ROOT.war
+
+        - name: Try deploy else restort the old artifact
+          block: 
+          - name: Deploy artifact
+            copy:
+              src: "/tmp/vpropp-{{version}}"
+              dest: /usr/local/tomcat8/webapps/ROOT.war 
+              remote_src: yes
+            register: deploy_info
+          
+          rescue:
+          - name: restore old artifact 
+            shell: cp -r old_ROOT ROOT 
+            args: 
+              chdir: /usr/local/tomcat8/webapps/
+            
+
+      rescue:
+      - name: start the tomcat service 
+        service:
+          name: tomcat 
+          state: started
+
+    - name: start the tomcat service 
+      service:
+        name: tomcat 
+        state: started 
+      when: deploy_info.changed
+
+    - name: wait until ROOT.war is extracted to ROOT 
+      wait_for:
+        path: /usr/local/tomcat8/webapps/ROOT
