@@ -5,84 +5,33 @@ def color_map = [
 
 pipeline {
     agent any 
-    tools {
-      jdk 'OracleJDK8'
-      maven 'MAVEN3'
-    }
     environment {
-      NEXUS_USER = 'admin'
-      NEXUS_PASS = 'admin'
-      SNAP_REPO = 'vprofile-snap'
-      RELEASE_REPO = 'vprofile-release'
-      CENTRAL_REPO = 'vprofile-mvn-central'
-      NEXUS_GRP_REPO = 'vprofile-group'
-      NEXUSIP = '98.80.123.89'
-      NEXUSPORT ='8081'
-      sonar_scanner = 'sonar4.7'
-      sonar_server = 'sonar'
-      NEXUS_LOGIN = 'nexus_login'
+     NEXUS_PASS = credentials('nexus_pass')
     }
     stages {
-        stage("Test") {
-            steps {
-              sh 'mvn -s settings.xml test'
-            }
-        }
-
-        stage("Checkstyle Analysis") {
-            steps {
-              sh 'mvn -s settings.xml checkstyle:checkstyle'
-            }
-        }
-
-        stage("sonar analysis") {
-          environment {
-            scannerHome = tool "${sonar_scanner}"
-          }
+        stage("providing parameters") {
           steps {
-            withSonarQubeEnv("${sonar_server}") {
-              sh ''' ${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
-              -Dsonar.projectName=vprofile-repo \
-              -Dsonar.projectVersion=1.0 \
-              -Dsonar.source=src \
-              -Dsonar.java.binaries=target/classes/com/visualpathit/account/controller \
-              -Dsonar.junit.reportsPath=target/surefire-reports \
-              -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-              -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml
-              '''
+            script {
+              properties {
+                parameters ([
+                  string(
+                    defaultValue:'',
+                    name: 'BUILD', 
+                  ),
+                  string(
+                    defaultValue: '',
+                    name: 'TIME',
+                  )
+                ])
+              }
             }
-          }
-        }
-        stage('build artifact') {
-          steps {
-            sh 'mvn -s settings.xml -DskipTests install'
-          }
-        }
-
-        stage("upload to nexus") {
-          steps {
-                nexusArtifactUploader(
-                nexusVersion: 'nexus3',
-                protocol: 'http',
-                nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
-                groupId: 'QA',
-                version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-                repository: "${RELEASE_REPO}" , 
-                credentialsId: "${NEXUS_LOGIN}",
-                artifacts: [
-                    [artifactId: 'vproapp',
-                    classifier: '',
-                    file: 'target/vprofile-v2.war',
-                    type: 'war']
-                ]
-                )
           }
         }
         stage("deploy using ansible") {
           steps {
             ansiblePlaybook(
               playbook: 'ansible/sites.yml',
-              inventory: 'ansible/stage-inventory.ini',
+              inventory: 'ansible/prod-inventory.ini',
               credentialsId: 'app_login',
               colorized: true,
               installation: 'ansible',
@@ -95,7 +44,7 @@ pipeline {
                 REPO: 'vprofile-release',
                 groupId: 'QA',
                 artifactId: 'vproapp',
-                version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}"
+                version: "${env.BUILD}-${env.TIME}"
               ]
 
             )

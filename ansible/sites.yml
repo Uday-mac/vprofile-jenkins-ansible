@@ -1,2 +1,3 @@
 ---
+- import_playbook: tomcat-setup.yml
 - import_playbook: vproapp-deploy.yml
