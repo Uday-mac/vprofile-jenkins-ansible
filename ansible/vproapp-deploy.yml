@@ -3,7 +3,7 @@
   hosts: app
   become: yes
   vars: 
-    timestamp: "{{ansible_date_time.date}}_{{ansible_date_time.houe}}_{{ansible_date_time.minute}}"
+    timestamp: "{{ansible_date_time.date}}_{{ansible_date_time.hour}}_{{ansible_date_time.minute}}"
   tasks:
     - name: Download artifact
       get_url:
